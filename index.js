@@ -15,7 +15,18 @@ import stickerRoutes from './routes/stickers.js';
 import matchRoutes from './routes/matches.js';
 import conversationRoutes from './routes/conversations.js';
 import { registerChatHandlers } from './socket/chatHandler.js';
+const cors = require('cors');
 
+// Configuración permitiendo múltiples orígenes o usando un wildcard para pruebas
+app.use(cors({
+  origin: [
+    'https://lami-trader-1jl2-b77dzl7ww-nicolashackus-projects.vercel.app', // La URL específica de tu imagen
+    'https://lami-trader-ljl2.vercel.app', // Tu URL principal de Vercel
+    'http://localhost:5173' // Para que te siga funcionando en local
+  ],
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  credentials: true
+}));
 const app = express();
 const httpServer = createServer(app);
 
