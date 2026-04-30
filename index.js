@@ -23,8 +23,16 @@ const httpServer = createServer(app);
 const io = new Server(httpServer, {
   cors: { origin: process.env.CLIENT_URL || 'https://lami-trader-ljl2.vercel.app', methods: ['GET','POST'] },
 });
+app.use(cors({
+  origin: [
+    'https://lami-trader-1jl2-b77dzl7ww-nicolashackus-projects.vercel.app',
+    'https://lami-trader-ljl2.vercel.app',
+    'http://localhost:5173'
+  ],
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  credentials: true
+}));
 
-app.use(cors({ origin: process.env.CLIENT_URL || 'https://lami-trader-ljl2.vercel.app' }));
 app.use(express.json());
 app.use('/uploads', express.static('uploads'));
 
