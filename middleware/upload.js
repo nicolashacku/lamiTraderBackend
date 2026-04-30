@@ -1,27 +1,22 @@
 import multer from 'multer';
-import path from 'path';
-import { mkdirSync } from 'fs';
 
-// Crear carpeta uploads si no existe
-mkdirSync('./uploads', { recursive: true });
-
-const storage = multer.diskStorage({
-  destination: (_req, _file, cb) => cb(null, './uploads'),
-  filename: (_req, file, cb) => {
-    const unique = `${Date.now()}-${Math.round(Math.random() * 1e6)}`;
-    cb(null, unique + path.extname(file.originalname));
-  },
-});
+/**
+ * Multer configurado con memoryStorage.
+ * La imagen llega en req.file.buffer — nunca toca el disco.
+ * Límite: 4 MB. Tipos: jpg, png, webp.
+ */
+const allowedMimes = ['image/jpeg', 'image/png', 'image/webp'];
 
 const fileFilter = (_req, file, cb) => {
-  const allowed = /jpeg|jpg|png|webp/;
-  const ok = allowed.test(path.extname(file.originalname).toLowerCase())
-           && allowed.test(file.mimetype);
-  ok ? cb(null, true) : cb(new Error('Solo se permiten imágenes JPG, PNG o WebP'));
+  if (allowedMimes.includes(file.mimetype)) {
+    cb(null, true);
+  } else {
+    cb(new Error('Solo se permiten imágenes JPG, PNG o WebP'), false);
+  }
 };
 
 export const upload = multer({
-  storage,
+  storage: multer.memoryStorage(),   // ← en memoria, sin carpetas locales
   fileFilter,
-  limits: { fileSize: 4 * 1024 * 1024 }, // 4 MB máx
+  limits: { fileSize: 4 * 1024 * 1024 }, // 4 MB
 });
