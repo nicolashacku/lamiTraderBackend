@@ -54,14 +54,18 @@ export const registerChatHandlers = (io, socket) => {
       // Recuperar el mensaje guardado (con _id generado)
       const savedMessage = conversation.messages[conversation.messages.length - 1];
 
-      // Emitir a todos en la sala de la conversación
-      io.to(`conv_${conversationId}`).emit('receive_message', {
+      const payload = {
         conversationId,
         message: {
           ...savedMessage.toObject(),
           sender: { _id: senderId },
         },
-      });
+      };
+
+      // FIX: broadcast solo a los OTROS sockets de la sala.
+      // El sender ya hizo optimistic update en el frontend —
+      // si usamos io.to() (que incluye al emisor) el mensaje aparece duplicado.
+      socket.to(`conv_${conversationId}`).emit('receive_message', payload);
     } catch (err) {
       console.error('❌ send_message error:', err);
     }
